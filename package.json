@@ -1,0 +1,21 @@
+{
+  "name": "nbc",
+  "version": "0.0.0",
+  "description": "nbc ===",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ScottWeinstein/nbc.git"
+  },
+  "author": "",
+  "license": "BSD",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "grunt-shell": "~0.2.0",
+    "coffee-script": "~1.4.0",
+    "grunt": "~0.4.0"
+  }
+}
