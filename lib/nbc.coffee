@@ -1,14 +1,14 @@
 fs = require 'fs'
 _ = require 'underscore'
+mkdirp = require('mkdirp')
 
-class BaysianTrainer
+class BaysianClassifier
     constructor: (@trainingDir) ->
 
     filterWord = (word) ->
         return false if word is ''
         return false if word.match /^-?\d+$/
         true
-
 
     getFilteredWordFromDoc = (docPath) ->
         text = fs.readFileSync docPath, 'utf8'
@@ -35,19 +35,28 @@ class BaysianTrainer
         partials = for w in words
             cnt = if kw[w]? then kw[w] else 0
             Math.log(cnt + 1) - logVocab  
-        likely = @sum partials
+        likely = sum partials
         # return    
-        klass: klass
+        "class": klass
         logprob: (likely + classiferData.priors[klass].logprob)
         prob: Math.exp(likely + classiferData.priors[klass].logprob)
     
 
-    classifyDocument = (classiferData, docPath) ->
+    classifyDocument: (classiferData, docPath) ->
         words = getFilteredWordFromDoc docPath
         probs = (getClassificationProb classiferData, klass, words for klass in _.keys(classiferData.docCounts))
-        console.log probs
         l = probs.reduce ((memo,item) -> if item.logprob > memo.logprob then item else memo), logprob:-Number.MAX_VALUE
         l.class
+    
+    classifyDirectory: (classiferData, testDir, resultsDir) ->
+        files = fs.readdirSync testDir
+        for file in files
+            srcFile = "#{testDir}/#{file}"
+            klass = @.classifyDocument classiferData, srcFile
+            destDir = "#{resultsDir}/#{klass}"
+            mkdirp.sync destDir
+            fs.symlinkSync(srcFile, "#{destDir}/#{file}")
+
 
     trainDirectory: (trainingDir=@trainingDir) ->
         trainingData = 
@@ -71,18 +80,9 @@ class BaysianTrainer
                 prob: trainingData.docCounts[klass] / allWordCount
                 logprob: Math.log(trainingData.docCounts[klass]) - Math.log(allWordCount)
 
-        #console.log trainingData.priors
         trainingData.numberOfWords = _.keys(trainingData.wordCounts).length
         return trainingData
 
 
-    classifyDirectory = (classiferData, testDir) ->
-        files = fs.readdirSync testDir
-        for file in files
-            klass = classifyDocument classiferData, "#{testDir}/#{file}"
-            console.log "mv #{testDir}/#{file} #{testDir}/#{klass}/#{file}"
 
-module.exports = BaysianTrainer
-
-# classiferData = trainData trainingDir
-# classifyDirectory classiferData, evalDir
+module.exports = BaysianClassifier
