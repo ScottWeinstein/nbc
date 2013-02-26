@@ -35,11 +35,10 @@ class BaysianClassifier
         partials = for w in words
             cnt = if kw[w]? then kw[w] else 0
             Math.log(cnt + 1) - logVocab  
-        likely = sum partials
+        likelihood = sum partials
         # return    
         "class": klass
-        logprob: (likely + classiferData.priors[klass].logprob)
-        prob: Math.exp(likely + classiferData.priors[klass].logprob)
+        logprob: (classiferData.priors[klass].logprob + likelihood)
     
 
     classifyDocument: (classiferData, docPath) ->

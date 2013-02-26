@@ -1,0 +1,1 @@
+P(class | document) = \frac{P(class) \cdot P(document | class)}{P(document)}

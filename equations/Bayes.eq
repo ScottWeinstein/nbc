@@ -1,0 +1,1 @@
+P(A | B) = \frac{P(A) \cdot   P(B | A)}{P(B)}
