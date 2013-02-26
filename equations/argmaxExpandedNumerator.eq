@@ -1,0 +1,1 @@
+=Max\left \{ P(C_1) \cdot P(D | C_1), P(C_2) \cdot P(D | C_2), \cdots P(C_n) \cdot P(D | C_n) \right \}

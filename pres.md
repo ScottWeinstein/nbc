@@ -27,7 +27,7 @@
 # Where are these used?
 * Most famously in spam detectors
 * But useful in many document classification problems such as
-    * Subject assignement
+    * Subject assignment
     * Authorship
     * Age determination
     * Sex determination
@@ -44,5 +44,21 @@
 
 # How does it work - theory
 ### Bayes theorem
+![](Bayes.png)
 
-![foo](foo.png)
+### Applied to document classification
+![](BayesDoc.png)
+
+### To classify a document we choose the _class_ which gives the highest probability
+![](argmax.png)
+![](argmaxExpanded.png)
+
+#### And we can drop the denominator, as it's the same across each
+![](argmaxExpandedNumerator.png)
+
+# OK, but what are $P(C_n)$ and $P(D|C_n)$
+
+* $P(C_n)$ is number docs of $Class_n$ relative to the total number of docs
+* To compute $P(D|C_n)$ we need to make some simplifing assumptions
+    * Order of words doesn't matter
+    * 

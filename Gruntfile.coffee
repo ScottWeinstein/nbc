@@ -19,7 +19,7 @@ module.exports = (grunt) ->
       #     stdout: true
       #     stderr: true
       slidy:
-        command: 'pandoc -t slidy -s pres.md -o output/slidy.html'
+        command: 'pandoc  -t slidy -s pres.md -o output/slidy.html'
         options:
           stdout: true
           stderr: true
@@ -29,7 +29,7 @@ module.exports = (grunt) ->
       #     stdout: true
       #     stderr: true
       dzslides:
-        command: 'pandoc -t dzslides -s pres.md -o output/dzslides.html'
+        command: 'pandoc  -t dzslides -s pres.md -o output/dzslides.html'
         options:
           stdout: true
           stderr: true
