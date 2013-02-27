@@ -31,6 +31,7 @@ class BaysianClassifier
 
     getClassificationProb = (classiferData, klass, words) ->
         kw = classiferData.classWords[klass]
+        # todo - precompute this
         logVocab = Math.log(sum(_.values(kw)) + classiferData.numberOfWords)
         partials = for w in words
             cnt = if kw[w]? then kw[w] else 0
