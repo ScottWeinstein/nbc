@@ -1,6 +1,7 @@
 fs = require 'fs'
 _ = require 'underscore'
 mkdirp = require('mkdirp')
+colors = require('colors')
 
 class BaysianClassifier
     constructor: (@trainingDir) ->
@@ -50,6 +51,7 @@ class BaysianClassifier
     
     classifyDirectory: (classiferData, testDir, resultsDir) ->
         files = fs.readdirSync testDir
+        console.log("Classifing #{files.length} documents".yellow)
         for file in files
             srcFile = "#{testDir}/#{file}"
             klass = @.classifyDocument classiferData, srcFile
@@ -81,6 +83,7 @@ class BaysianClassifier
                 logprob: Math.log(trainingData.docCounts[klass]) - Math.log(allWordCount)
 
         trainingData.numberOfWords = _.keys(trainingData.wordCounts).length
+        console.log("Trained #{allWordCount} documents".green)
         return trainingData
 
 
