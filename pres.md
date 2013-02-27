@@ -43,7 +43,7 @@
 
 # Demo
 
-# How does it work - theory 1
+# How does it work
 ### Bayes theorem
 $P(A | B) = \frac{P(A) \cdot   P(B | A)}{P(B)}$
 

@@ -10,47 +10,30 @@ module.exports = (grunt) ->
       eq:
         files: ['equations/*.eq']
         tasks: ['shell:makeEq']
-    pkg: grunt.file.readJSON("package.json")
-    # uglify:
-    #   options:
-    #     banner: "/*! <%= pkg.name %> <%= grunt.template.today(\"yyyy-mm-dd\") %> */\n"
-
-    #   build:
-    #     src: "src/<%= pkg.name %>.js"
-    #     dest: "build/<%= pkg.name %>.min.js"
+      groc:
+        files: ['lib/*.coffee', 'Readme.md']
+        tasks: ['shell:groc']
     shell:
       mkdir: 
         command: 'mkdir output'
-      # s5:
-      #   command: 'pandoc -t s5 -s pres.md -o output/s5.html' #--self-contained
-      #   options:
-      #     stdout: true
-      #     stderr: true
       slidy:
         command: "pandoc --mathjax=#{mathjaxUrl}  -t slidy -s pres.md -o output/slidy.html"
         options:
           stdout: true
           stderr: true
-      # slideous:
-      #   command: 'pandoc -t slideous -s pres.md -o output/slideous.html'
-      #   options:
-      #     stdout: true
-      #     stderr: true
       dzslides:
         command: "pandoc --mathjax=#{mathjaxUrl} -t dzslides -s pres.md -o output/dzslides.html"
         options:
           stdout: true
           stderr: true
-      # beamer:
-      #   command: 'pandoc -t beamer -s pres.md -o output/beamer.pdf'
-      #   options:
-      #     stdout: true
-      #     stderr: true
       makeEquations:
-          command: 'coffee makeEquations.coffee'
-          options:
-            stdout: true
-            stderr: true
+        command: 'coffee makeEquations.coffee'
+        options:
+          stdout: true
+          stderr: true
+      groc:
+        command: 'groc README.md lib/nbc.coffee'
+
 
 
   
