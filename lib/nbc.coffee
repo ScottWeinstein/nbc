@@ -31,16 +31,11 @@ class BaysianClassifier
 
 
     getClassificationProb = (classiferData, klass, words) ->
-        kw = classiferData.classWords[klass]
-        # todo - precompute this
-        logVocab = Math.log(sum(_.values(kw)) + classiferData.numberOfWords)
-        partials = for w in words
-            cnt = if kw[w]? then kw[w] else 0
-            Math.log(cnt + 1) - logVocab  
-        likelihood = sum partials
-        # return    
+        ll = classiferData.likelihood[klass]
+        getLikelihood = (w) -> if ll[w]? then ll[w] else classiferData.unknownWord[klass]
+        likelihood = sum(getLikelihood(w) for w in words)
         "class": klass
-        logprob: (classiferData.priors[klass].logprob + likelihood)
+        logprob: (classiferData.priors[klass] + likelihood)
     
     simplifyTrainingData = (trainingData) ->
         td = 
@@ -61,13 +56,14 @@ class BaysianClassifier
 
     classifyDocument: (classiferData, docPath) ->
         words = getFilteredWordFromDoc docPath
-        probs = (getClassificationProb classiferData, klass, words for klass in _.keys(classiferData.docCounts))
+        probs = (getClassificationProb classiferData, klass, words for klass, ign of classiferData.priors)
         l = probs.reduce ((memo,item) -> if item.logprob > memo.logprob then item else memo), logprob:-Number.MAX_VALUE
         l.class
     
     classifyDirectory: (classiferData, testDir, resultsDir) ->
         files = fs.readdirSync testDir
         console.log("Classifing #{files.length} documents".yellow)
+        
         for file in files
             srcFile = "#{testDir}/#{file}"
             klass = @.classifyDocument classiferData, srcFile
