@@ -63,13 +63,16 @@ class BaysianClassifier
     classifyDirectory: (classiferData, testDir, resultsDir) ->
         files = fs.readdirSync testDir
         console.log("Classifing #{files.length} documents".yellow)
-        
+        summary = {}        
         for file in files
             srcFile = "#{testDir}/#{file}"
             klass = @.classifyDocument classiferData, srcFile
+            summary[klass] = 1 + if summary[klass]? then summary[klass] else 0 
             destDir = "#{resultsDir}/#{klass}"
             mkdirp.sync destDir
             fs.symlinkSync(srcFile, "#{destDir}/#{file}")
+        for k, cnt of summary   
+            console.log("#{cnt} #{k}".green)
 
 
     trainDirectory: (trainingDir=@trainingDir) ->
