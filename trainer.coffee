@@ -2,7 +2,8 @@ fs = require 'fs'
 Trainer = require('./lib/nbc')
 
 trainer = new Trainer('/tmp/nbc/trainDir')
-trainingData = trainer.trainDirectory()
-fs.writeFileSync 'output/classifier.json', JSON.stringify(trainingData, null, "  "), 'utf8'
+td = trainer.trainDirectory()
+fs.writeFileSync 'output/classifier_diag.json', JSON.stringify(td.diag, null, "  "), 'utf8'
+fs.writeFileSync 'output/classifier.json', JSON.stringify(td.trainingData, null, "  "), 'utf8'
 d = (new Date()).toISOString()
-trainer.classifyDirectory(trainingData, '/tmp/nbc/logs', "/tmp/nbc/classifed-#{d}")
+trainer.classifyDirectory(td.diag, '/tmp/nbc/logs', "/tmp/nbc/classifed-#{d}")

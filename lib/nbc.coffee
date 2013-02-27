@@ -42,6 +42,22 @@ class BaysianClassifier
         "class": klass
         logprob: (classiferData.priors[klass].logprob + likelihood)
     
+    simplifyTrainingData = (trainingData) ->
+        td = 
+            priors: {}
+            likelihood: {}
+            unknownWord: {}
+
+        for key, val of trainingData.priors
+            td.priors[key] = val.logprob
+
+        for k, kw of trainingData.classWords
+            td.likelihood[k] = {}
+            denom = Math.log(sum(_.values(kw)) + trainingData.numberOfWords + 1)
+            for word, count of kw
+                td.likelihood[k][word] = Math.log(count + 1) - denom
+            td.unknownWord[k] = 0-denom
+        td
 
     classifyDocument: (classiferData, docPath) ->
         words = getFilteredWordFromDoc docPath
@@ -84,7 +100,8 @@ class BaysianClassifier
 
         trainingData.numberOfWords = _.keys(trainingData.wordCounts).length
         console.log("Trained #{allWordCount} documents".green)
-        return trainingData
+        trainingData: simplifyTrainingData(trainingData)
+        diag: trainingData
 
 
 
