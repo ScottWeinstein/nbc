@@ -1,0 +1,5 @@
+publish.sh
+node_modules
+lib/
+output/
+doc/
