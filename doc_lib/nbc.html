@@ -1,0 +1,110 @@
+<!DOCTYPE html><html lang="en"><head><title>lib/nbc</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="lib/nbc"><meta name="groc-project-path" content="lib/nbc.coffee"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/nbc.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG" type="text/javascript"></script></div></div><div class="code"><div class="wrapper"><span class="nv">fs = </span><span class="nx">require</span> <span class="s">&#39;fs&#39;</span>
+<span class="nv">mkdirp = </span><span class="nx">require</span><span class="p">(</span><span class="s">&#39;mkdirp&#39;</span><span class="p">)</span>
+<span class="nv">colors = </span><span class="nx">require</span><span class="p">(</span><span class="s">&#39;colors&#39;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nx">BayesianClassifier</span>
+    <span class="nv">constructor: </span><span class="nf">(@trainingDir) -&gt;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>remove empty and words which are just numbers</p></div></div><div class="code"><div class="wrapper">    <span class="nv">filterWord = </span><span class="nf">(word) -&gt;</span>
+        <span class="k">return</span> <span class="kc">false</span> <span class="k">if</span> <span class="nx">word</span> <span class="o">is</span> <span class="s">&#39;&#39;</span>
+        <span class="k">return</span> <span class="kc">false</span> <span class="k">if</span> <span class="nx">word</span><span class="p">.</span><span class="nx">match</span> <span class="sr">/^-?\d+$/</span>
+        <span class="kc">true</span>
+
+    <span class="nv">getFilteredWordFromDoc = </span><span class="nf">(docPath) -&gt;</span>
+        <span class="nv">text = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="nx">docPath</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span>
+        <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="sr">/\s|&lt;|&gt;|,|\. |=/</span><span class="p">).</span><span class="nx">filter</span> <span class="nx">filterWord</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>for a file, <code>docPath</code>, get the valid words
+and for each word count it's occurance, in it's Class, <code>klass</code>, and in the entire dictionary</p></div></div><div class="code"><div class="wrapper">    <span class="nv">trainDocument = </span><span class="nf">(td, klass, docPath) -&gt;</span>
+        <span class="nx">td</span><span class="p">.</span><span class="nx">docCounts</span><span class="p">[</span><span class="nx">klass</span><span class="p">]</span><span class="o">++</span>
+        <span class="nv">kw = </span><span class="nx">td</span><span class="p">.</span><span class="nx">classWords</span><span class="p">[</span><span class="nx">klass</span><span class="p">]</span>
+        <span class="k">for</span> <span class="nx">word</span> <span class="k">in</span> <span class="nx">getFilteredWordFromDoc</span> <span class="nx">docPath</span> 
+            <span class="nx">td</span><span class="p">.</span><span class="nx">wordCounts</span><span class="p">[</span><span class="nx">word</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="o">!</span><span class="nx">td</span><span class="p">.</span><span class="nx">wordCounts</span><span class="p">[</span><span class="nx">word</span><span class="p">]</span><span class="o">?</span>
+            <span class="nx">kw</span><span class="p">[</span><span class="nx">word</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="o">!</span><span class="nx">kw</span><span class="p">[</span><span class="nx">word</span><span class="p">]</span><span class="o">?</span>
+
+            <span class="nx">td</span><span class="p">.</span><span class="nx">wordCounts</span><span class="p">[</span><span class="nx">word</span><span class="p">]</span><span class="o">++</span>
+            <span class="nx">kw</span><span class="p">[</span><span class="nx">word</span><span class="p">]</span><span class="o">++</span>
+
+
+    <span class="nv">sum = </span><span class="nf">(l) -&gt;</span> <span class="nx">l</span><span class="p">.</span><span class="nx">reduce</span> <span class="p">(</span><span class="nf">(a,b) -&gt;</span> <span class="nx">a</span><span class="o">+</span><span class="nx">b</span><span class="p">),</span> <span class="mi">0</span>
+    <span class="nv">sumValues = </span><span class="nf">(o) -&gt;</span>
+        <span class="nv">s = </span><span class="mi">0</span>
+        <span class="nx">s</span> <span class="o">+=</span> <span class="nx">val</span> <span class="k">for</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">val</span> <span class="k">of</span> <span class="nx">o</span>
+        <span class="nx">s</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>For a Document, <code>words</code>, and a Class, <code>klass</code> compute the following</p>
+
+<p><span class="math">\(\ln(P(C_{klass})) + \sum \ln(P(Words_n|C_{klass}))\)</span></p>
+
+<p>though note that the actual individual probabilites have been computed, and this is mostly a lookup task</p></div></div><div class="code"><div class="wrapper">    <span class="nv">getClassificationProb = </span><span class="nf">(classiferData, klass, words) -&gt;</span>
+        <span class="nv">ll = </span><span class="nx">classiferData</span><span class="p">.</span><span class="nx">likelihood</span><span class="p">[</span><span class="nx">klass</span><span class="p">]</span>
+        <span class="nv">getLikelihood = </span><span class="nf">(w) -&gt;</span> <span class="k">if</span> <span class="nx">ll</span><span class="p">[</span><span class="nx">w</span><span class="p">]</span><span class="o">?</span> <span class="k">then</span> <span class="nx">ll</span><span class="p">[</span><span class="nx">w</span><span class="p">]</span> <span class="k">else</span> <span class="nx">classiferData</span><span class="p">.</span><span class="nx">unknownWord</span><span class="p">[</span><span class="nx">klass</span><span class="p">]</span>
+        <span class="nv">likelihood = </span><span class="nx">sum</span><span class="p">(</span><span class="nx">getLikelihood</span><span class="p">(</span><span class="nx">w</span><span class="p">)</span> <span class="k">for</span> <span class="nx">w</span> <span class="k">in</span> <span class="nx">words</span><span class="p">)</span>
+        <span class="s">&quot;class&quot;</span><span class="o">:</span> <span class="nx">klass</span>
+        <span class="nv">logprob: </span><span class="p">(</span><span class="nx">classiferData</span><span class="p">.</span><span class="nx">priors</span><span class="p">[</span><span class="nx">klass</span><span class="p">]</span> <span class="o">+</span> <span class="nx">likelihood</span><span class="p">)</span>
+    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>During training we collect more info than we need, this will discard the unneeded data and
+pre-compute the laplace smoothed logliklihood of each word per Class</p></div></div><div class="code"><div class="wrapper">    <span class="nv">simplifyTrainingData = </span><span class="nf">(trainingData) -&gt;</span>
+        <span class="nv">td = </span>
+            <span class="nv">priors: </span><span class="p">{}</span>
+            <span class="nv">likelihood: </span><span class="p">{}</span>
+            <span class="nv">unknownWord: </span><span class="p">{}</span>
+
+        <span class="k">for</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">val</span> <span class="k">of</span> <span class="nx">trainingData</span><span class="p">.</span><span class="nx">priors</span>
+            <span class="nx">td</span><span class="p">.</span><span class="nx">priors</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">val</span><span class="p">.</span><span class="nx">logprob</span>
+
+        <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">kw</span> <span class="k">of</span> <span class="nx">trainingData</span><span class="p">.</span><span class="nx">classWords</span>
+            <span class="nx">td</span><span class="p">.</span><span class="nx">likelihood</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>The formula we're computing is</p>
+
+<p><span class="math">\( \ln(\frac{num(W_n,C_c) + 1}{num(W,C_c) + \left | V \right |+1}) \)</span></p></div></div><div class="code"><div class="wrapper">            <span class="nv">denom = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">sumValues</span><span class="p">(</span><span class="nx">kw</span><span class="p">)</span> <span class="o">+</span> <span class="nx">trainingData</span><span class="p">.</span><span class="nx">numberOfWords</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="nx">word</span><span class="p">,</span> <span class="nx">count</span> <span class="k">of</span> <span class="nx">kw</span>
+                <span class="nx">td</span><span class="p">.</span><span class="nx">likelihood</span><span class="p">[</span><span class="nx">k</span><span class="p">][</span><span class="nx">word</span><span class="p">]</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="nx">denom</span>
+
+            <span class="nx">td</span><span class="p">.</span><span class="nx">unknownWord</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="o">-</span><span class="nx">denom</span>
+        <span class="nx">td</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Get the words for a doc
+compute the <code>P(C|D)</code>
+get the Class which has the greatest <code>P(C|D)</code></p></div></div><div class="code"><div class="wrapper">    <span class="nv">classifyDocument: </span><span class="nf">(classiferData, docPath) -&gt;</span>
+        <span class="nv">words = </span><span class="nx">getFilteredWordFromDoc</span> <span class="nx">docPath</span>
+        <span class="nv">probs = </span><span class="p">(</span><span class="nx">getClassificationProb</span> <span class="nx">classiferData</span><span class="p">,</span> <span class="nx">klass</span><span class="p">,</span> <span class="nx">words</span> <span class="k">for</span> <span class="nx">klass</span><span class="p">,</span> <span class="nx">ign</span> <span class="k">of</span> <span class="nx">classiferData</span><span class="p">.</span><span class="nx">priors</span><span class="p">)</span>
+        <span class="nv">l = </span><span class="nx">probs</span><span class="p">.</span><span class="nx">reduce</span> <span class="p">(</span><span class="nf">(memo,item) -&gt;</span> <span class="k">if</span> <span class="nx">item</span><span class="p">.</span><span class="nx">logprob</span> <span class="o">&gt;</span> <span class="nx">memo</span><span class="p">.</span><span class="nx">logprob</span> <span class="k">then</span> <span class="nx">item</span> <span class="k">else</span> <span class="nx">memo</span><span class="p">),</span> <span class="nx">logprob</span><span class="o">:-</span><span class="nb">Number</span><span class="p">.</span><span class="nx">MAX_VALUE</span>
+        <span class="nx">l</span><span class="p">.</span><span class="nx">class</span>
+    
+    <span class="nv">classifyDirectory: </span><span class="nf">(classiferData, testDir, resultsDir) -&gt;</span>
+        <span class="nv">files = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readdirSync</span> <span class="nx">testDir</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s">&quot;Classifing </span><span class="si">#{</span><span class="nx">files</span><span class="p">.</span><span class="nx">length</span><span class="si">}</span><span class="s"> documents&quot;</span><span class="p">.</span><span class="nx">yellow</span><span class="p">)</span>
+        <span class="nv">summary = </span><span class="p">{}</span>        
+        <span class="k">for</span> <span class="nx">file</span> <span class="k">in</span> <span class="nx">files</span>
+            <span class="nv">srcFile = </span><span class="s">&quot;</span><span class="si">#{</span><span class="nx">testDir</span><span class="si">}</span><span class="s">/</span><span class="si">#{</span><span class="nx">file</span><span class="si">}</span><span class="s">&quot;</span>
+            <span class="nv">klass = </span><span class="nx">@</span><span class="p">.</span><span class="nx">classifyDocument</span> <span class="nx">classiferData</span><span class="p">,</span> <span class="nx">srcFile</span>
+            <span class="nx">summary</span><span class="p">[</span><span class="nx">klass</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="k">if</span> <span class="nx">summary</span><span class="p">[</span><span class="nx">klass</span><span class="p">]</span><span class="o">?</span> <span class="k">then</span> <span class="nx">summary</span><span class="p">[</span><span class="nx">klass</span><span class="p">]</span> <span class="k">else</span> <span class="mi">0</span> 
+            <span class="nv">destDir = </span><span class="s">&quot;</span><span class="si">#{</span><span class="nx">resultsDir</span><span class="si">}</span><span class="s">/</span><span class="si">#{</span><span class="nx">klass</span><span class="si">}</span><span class="s">&quot;</span>
+            <span class="nx">mkdirp</span><span class="p">.</span><span class="nx">sync</span> <span class="nx">destDir</span>
+            <span class="nx">fs</span><span class="p">.</span><span class="nx">symlinkSync</span><span class="p">(</span><span class="nx">srcFile</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">destDir</span><span class="si">}</span><span class="s">/</span><span class="si">#{</span><span class="nx">file</span><span class="si">}</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">cnt</span> <span class="k">of</span> <span class="nx">summary</span>   
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s">&quot;</span><span class="si">#{</span><span class="nx">cnt</span><span class="si">}</span><span class="s"> </span><span class="si">#{</span><span class="nx">k</span><span class="si">}</span><span class="s">&quot;</span><span class="p">.</span><span class="nx">green</span><span class="p">)</span>
+
+
+    <span class="nv">trainDirectory: </span><span class="nf">(trainingDir=@trainingDir) -&gt;</span>
+        <span class="nv">trainingData = </span>
+            <span class="nv">docCounts: </span> <span class="p">{}</span>
+            <span class="nv">wordCounts: </span><span class="p">{}</span>
+            <span class="nv">classWords: </span><span class="p">{}</span>
+            <span class="nv">priors: </span>    <span class="p">{}</span>
+
+        <span class="nv">files = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readdirSync</span> <span class="nx">trainingDir</span>
+        <span class="k">for</span> <span class="nx">file</span> <span class="k">in</span> <span class="nx">files</span>
+            <span class="nx">trainingData</span><span class="p">.</span><span class="nx">docCounts</span><span class="p">[</span><span class="nx">file</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> 
+            <span class="nx">trainingData</span><span class="p">.</span><span class="nx">classWords</span><span class="p">[</span><span class="nx">file</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="nx">file</span> <span class="k">in</span> <span class="nx">files</span>
+            <span class="nv">sfiles = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readdirSync</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">trainingDir</span><span class="si">}</span><span class="s">/</span><span class="si">#{</span><span class="nx">file</span><span class="si">}</span><span class="s">&quot;</span>
+            <span class="k">for</span> <span class="nx">docFile</span> <span class="k">in</span> <span class="nx">sfiles</span>
+                <span class="nx">trainDocument</span> <span class="nx">trainingData</span><span class="p">,</span> <span class="nx">file</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">trainingDir</span><span class="si">}</span><span class="s">/</span><span class="si">#{</span><span class="nx">file</span><span class="si">}</span><span class="s">/</span><span class="si">#{</span><span class="nx">docFile</span><span class="si">}</span><span class="s">&quot;</span>
+
+        <span class="nv">allWordCount = </span><span class="nx">sumValues</span> <span class="nx">trainingData</span><span class="p">.</span><span class="nx">docCounts</span>
+        <span class="k">for</span> <span class="nx">klass</span><span class="p">,</span> <span class="nx">count</span> <span class="k">of</span> <span class="nx">trainingData</span><span class="p">.</span><span class="nx">classWords</span>
+            <span class="nx">trainingData</span><span class="p">.</span><span class="nx">priors</span><span class="p">[</span><span class="nx">klass</span><span class="p">]</span> <span class="o">=</span> 
+                <span class="nv">prob: </span><span class="nx">trainingData</span><span class="p">.</span><span class="nx">docCounts</span><span class="p">[</span><span class="nx">klass</span><span class="p">]</span> <span class="o">/</span> <span class="nx">allWordCount</span>
+                <span class="nv">logprob: </span><span class="nb">Math</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">trainingData</span><span class="p">.</span><span class="nx">docCounts</span><span class="p">[</span><span class="nx">klass</span><span class="p">])</span> <span class="o">-</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">allWordCount</span><span class="p">)</span>
+
+        <span class="nv">trainingData.numberOfWords = </span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">ign</span> <span class="k">of</span> <span class="nx">trainingData</span><span class="p">.</span><span class="nx">wordCounts</span><span class="p">).</span><span class="nx">length</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s">&quot;Trained </span><span class="si">#{</span><span class="nx">allWordCount</span><span class="si">}</span><span class="s"> documents&quot;</span><span class="p">.</span><span class="nx">green</span><span class="p">)</span>
+        <span class="nv">trainingData: </span><span class="nx">simplifyTrainingData</span><span class="p">(</span><span class="nx">trainingData</span><span class="p">)</span>
+        <span class="nv">diag: </span><span class="nx">trainingData</span>
+
+
+
+<span class="nv">module.exports = </span><span class="nx">BayesianClassifier</span></div></div></div></div></body></html>
