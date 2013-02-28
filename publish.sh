@@ -1,6 +1,7 @@
 #!/bin/sh
 
 grunt
+g commit -am "update"
 git checkout gh-pages
 mv output/* .
 rm -r output
