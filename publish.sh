@@ -1,7 +1,7 @@
 #!/bin/sh
 
 grunt
-g commit -am "update"
+git commit -am "update"
 git checkout gh-pages
 mv output/* .
 rm -r output
@@ -15,5 +15,5 @@ mv doc/* .
 git add -A
 git commit -m "update docs"
 git push 
-g checkout master
+git checkout master
 
