@@ -4,6 +4,8 @@ grunt
 git checkout gh-pages
 mv output/* .
 rm -r output
+rm index.html
+mv nbc.html index.html
 
 rm -rf assets
 rm doc/index.html
@@ -13,3 +15,4 @@ git add -A
 git commit -m "update docs"
 git push 
 g checkout master
+

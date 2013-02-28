@@ -114,5 +114,6 @@ $argmax_c \left \{ \ln(\frac{num C_c}{num C}) + \sum \ln(\frac{num(W_n,C_c) + 1}
 
 # Let's look at the code
 
-## [sdfsdf](sdfsdf)
+## [annotated code](http://scottweinstein.github.com/nbc/doc_lib/nbc.html)
+
 # Questions?
