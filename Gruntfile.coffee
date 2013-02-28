@@ -33,9 +33,9 @@ module.exports = (grunt) ->
         command: 'groc README.md lib/nbc.coffee'
     stylus:
       compile:
-        # options:
+        options:
           # paths: ["path/to/import", "another/to/import"]
-          # urlfunc: "embedurl" # use embedurl('test.png') in our code to trigger Data URI embedding
+          urlfunc: "url" # use embedurl('test.png') in our code to trigger Data URI embedding
           # use: [require("fluidity")] # use stylus plugin at compile time
           # #  @import 'foo', 'bar/moo', etc. into every .styl file
           # #  that is compiled. These might be findable based on values you gave
