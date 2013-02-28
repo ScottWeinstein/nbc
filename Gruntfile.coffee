@@ -20,7 +20,7 @@ module.exports = (grunt) ->
       mkdir: 
         command: 'mkdir output'
       dzslides:
-        command: "pandoc  --mathjax=#{mathjaxUrl} --css=lab49.css -t dzslides -s pres.md -o output/dzslides.html"
+        command: "pandoc  --mathjax=#{mathjaxUrl} --css=lab49.css -t dzslides -s pres.md -o output/nbc.html"
       makeEquations:
         command: 'coffee makeEquations.coffee'
       groc:
