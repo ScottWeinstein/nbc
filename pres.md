@@ -3,22 +3,22 @@
 
 
 
-# Backstory
+# Back story
 * Tens of thousands of individual log files
     * Not the ideal way to structure the data, but often we need to work with what we're given
 * Most of which had irrelevant garbage
 * Some had exception messages, indicating a bug in the code
 * Some had error messages, indicating a poor user experience
-* Sorting though the files by hand wasn't feasible
+* Sorting though the files by hand wasn't feasible, at least not desirable
 
 # Approaches
-* A year ago I would have used some regular expressions to pick out text I thought was important
+* Regular expressions to pick out text I thought was important
     * Boring
     * Error prone
     * Hard to maintain "now he has two problems"
-* This time, armed with some machine learning theory I tried something else
+* An ML approach, by choosing a few by hand and then letting the program classify the rest
 
-# What's a Naive Bayesian Classifier?
+# What's a _Naive Bayesian Classifier_?
 
 ## Let's look at each word
 * **Classifier** - code that makes a prediction about data into a set of enumerated choices (as opposed to say a continuous value)
@@ -30,14 +30,13 @@
 * But useful in many document classification problems such as
     * Subject assignment
     * Authorship
-    * Age determination
-    * Sex determination
-
+    * Age or sex determination
+    * sentiment
 
 ## Why this vs other approaches?
 * Works surprisingly well
 * Easy to understand
-* Easy to code (no linear algebra)
+* Easy to code - no linear algebra or graph structures needed
 * Fast run time
 
 
@@ -45,9 +44,13 @@
 
 # How does it work
 ### Bayes theorem
+
+We'll take this as a given, describing how to compute a conditional probability
 $P(A | B) = \frac{P(A) \cdot   P(B | A)}{P(B)}$
 
 ### Applied to document classification
+
+Here we're setting up the basic structure of how we'll do classification
 $P(class | document) = \frac{P(class) \cdot P(document | class)}{P(document)}$
 
 ### To classify a document we choose the _class_ which gives the highest probability
@@ -77,18 +80,18 @@ And if $P(C_X)$ is just  $\frac{number \ docs \ of \ Class_n}{total \ number \ d
 3. And to compute $P(W_n| C_X)$ is again just the ratio 
 4. the number times $W_n$ in $C_X$ over the total number of words in $C_X$ 
 
-## Bringing it together we end up with $argmax_c P(C_c) \cdot \prod P(W_n|C_c)$
+## we end up with $argmax_c P(C_c) \cdot \prod P(W_n|C_c)$
 
 
 # Two things to fix before we're done 
 ## Unknown words
-Words we haven't seen before will ruin the above formula. 
-Count of the unknown word is 0 in the numerator, the whole thing is a product, and the document becomes unclassifiable
+Words we haven't seen before will _ruin_ the above formula. 
+The count of an unknown word will put a $0$ in the numerator. As the whole thing is a product, the probability for each class becomes $0$ and the document becomes unclassifiable
 
-So we fix this via Laplace smoothing, by adding 1, and there are a number of ways to do this
+So we fix this via _Laplace smoothing_, by adding $1$ to all values
 
 ## Floating point underflow
-The product of small probabilities can hit machine precision quickly, to avoid we compute via logs
+The product of small probabilities can hit machine precision quickly, to avoid this we compute in 
 
 ## The net formula we use is
 
@@ -96,3 +99,4 @@ $argmax_c \left \{  \ln(P(C_c)) + \sum \ln(P(W_n|C_c))  \right \}$
    
 $argmax_c \left \{ \ln(\frac{num C_c}{num C}) + \sum \ln(\frac{num(W_n,C_c) + 1}{num(W,C_c) + \left | V \right |+1}) \right \}$
 
+# Questions?
