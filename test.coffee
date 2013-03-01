@@ -2,9 +2,10 @@ chai = require('chai')
 chai.should()
 
 describe "NBC", () ->
-    nbc = require('./lib/nbc')
+    nbc = require('./lib/BayesianClassifierCore')
     describe "classification", () ->
         trainer = new nbc()
+    
         trainingData = trainer.getEmptyTrainingData()
 
         it 'Must train documents', () ->
