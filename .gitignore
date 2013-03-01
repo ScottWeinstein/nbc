@@ -17,3 +17,6 @@ output/
 doc/
 docs/
 doc_lib/
+
+classifier.json
+classifier_diag.json
