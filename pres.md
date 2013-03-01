@@ -56,7 +56,7 @@ $P(A | B) = \frac{P(A) \cdot   P(B | A)}{P(B)}$
 
 Here we're setting up the basic structure of how we'll do classification
 
-$P(class | document) = \frac{P(class) \cdot P(document | class)}{P(document)}$
+$P(category | document) = \frac{P(category) \cdot P(document | category)}{P(document)}$
 
 # How does it work - 2
 To classify a document we choose the _class_ which gives the highest probability
