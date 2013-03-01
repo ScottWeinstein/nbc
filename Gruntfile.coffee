@@ -24,7 +24,7 @@ module.exports = (grunt) ->
       # makeEquations:
       #   command: 'coffee makeEquations.coffee'
       groc:
-        command: 'groc README.md test.coffee lib/nbc.coffee'
+        command: 'groc README.md test.coffee lib/*.coffee'
       test:
         command: 'mocha  --compilers coffee:coffee-script  test.coffee -R spec'
         options:
