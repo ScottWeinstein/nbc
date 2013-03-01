@@ -84,6 +84,40 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["#"],
               "name": "CoffeeScript"
             },
+            "sourcePath": "/Users/sweinstein/d/github/nbc/lib/BayesianClassifierCore.coffee",
+            "projectPath": "lib/BayesianClassifierCore.coffee",
+            "targetPath": "lib/BayesianClassifierCore",
+            "title": "BayesianClassifierCore"
+          },
+          "depth": 2,
+          "outline": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Training",
+                "slug": "training"
+              },
+              "depth": 1
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Classification",
+                "slug": "classification"
+              },
+              "depth": 1
+            }
+          ]
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".coffee", "Cakefile"],
+              "pygmentsLexer": "coffee-script",
+              "singleLineComment": ["#"],
+              "name": "CoffeeScript"
+            },
             "sourcePath": "/Users/sweinstein/d/github/nbc/lib/nbc.coffee",
             "projectPath": "lib/nbc.coffee",
             "targetPath": "lib/nbc",
