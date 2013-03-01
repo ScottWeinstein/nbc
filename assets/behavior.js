@@ -90,9 +90,43 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "title": "nbc"
           },
           "depth": 2,
-          "outline": []
+          "outline": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Training",
+                "slug": "training"
+              },
+              "depth": 1
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Classification",
+                "slug": "classification"
+              },
+              "depth": 1
+            }
+          ]
         }
       ]
+    }, {
+      "type": "file",
+      "data": {
+        "language": {
+          "nameMatchers": [".coffee", "Cakefile"],
+          "pygmentsLexer": "coffee-script",
+          "singleLineComment": ["#"],
+          "name": "CoffeeScript"
+        },
+        "sourcePath": "/Users/sweinstein/d/github/nbc/test.coffee",
+        "projectPath": "test.coffee",
+        "targetPath": "test",
+        "title": "test"
+      },
+      "depth": 1,
+      "outline": []
     }
   ];
 
