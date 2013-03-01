@@ -3,3 +3,5 @@ node_modules
 lib/
 output/
 doc/
+classifier.json
+classifier_diag.json
