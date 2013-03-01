@@ -2,9 +2,10 @@
 <span class="nx">chai</span><span class="p">.</span><span class="nx">should</span><span class="p">()</span>
 
 <span class="nx">describe</span> <span class="s">&quot;NBC&quot;</span><span class="p">,</span> <span class="p">()</span> <span class="nf">-&gt;</span>
-    <span class="nv">nbc = </span><span class="nx">require</span><span class="p">(</span><span class="s">&#39;./lib/nbc&#39;</span><span class="p">)</span>
+    <span class="nv">nbc = </span><span class="nx">require</span><span class="p">(</span><span class="s">&#39;./lib/BayesianClassifierCore&#39;</span><span class="p">)</span>
     <span class="nx">describe</span> <span class="s">&quot;classification&quot;</span><span class="p">,</span> <span class="p">()</span> <span class="nf">-&gt;</span>
         <span class="nv">trainer = </span><span class="k">new</span> <span class="nx">nbc</span><span class="p">()</span>
+    
         <span class="nv">trainingData = </span><span class="nx">trainer</span><span class="p">.</span><span class="nx">getEmptyTrainingData</span><span class="p">()</span>
 
         <span class="nx">it</span> <span class="s">&#39;Must train documents&#39;</span><span class="p">,</span> <span class="p">()</span> <span class="nf">-&gt;</span>
