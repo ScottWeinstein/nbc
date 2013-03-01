@@ -11,33 +11,32 @@ class BayesianClassifier
 
     # Iterate through each dir==Class, and each file in each dir counting docs and words per class
     trainDirectory: (trainingDir=@trainingDir) ->
-        trainingData = 
-            docCounts:  {}
-            wordCounts: {}
-            classWords: {}
-            priors:     {}
+        trainingData = @getEmptyTrainingData()
 
         files = fs.readdirSync trainingDir
         for file in files when file isnt '.DS_Store'
-            trainingData.docCounts[file] = 0 
-            trainingData.classWords[file] = {}
-        for file in files when file isnt '.DS_Store'
             sfiles = fs.readdirSync "#{trainingDir}/#{file}"
             for docFile in sfiles when docFile isnt '.DS_Store'
-                trainDocument trainingData, file, "#{trainingDir}/#{file}/#{docFile}"
+                @trainDocument trainingData, file, getFilteredWordFromDoc("#{trainingDir}/#{file}/#{docFile}")
 
         ret =
-            trainingData: simplifyTrainingData(trainingData)
+            trainingData: @simplifyTrainingData(trainingData)
             diag: trainingData
 
         allWordCount = sumValues trainingData.docCounts
         console.log("Trained #{allWordCount} documents".green)
         return ret
 
+    getEmptyTrainingData: () ->
+        docCounts:  {}
+        wordCounts: {}
+        classWords: {}
+        priors:     {}
+
 
     # During training we collect more info than we need, this will discard the unneeded data and
     # pre-compute the laplace smoothed logliklihood of each word per Class
-    simplifyTrainingData = (trainingData) ->
+    simplifyTrainingData: (trainingData) ->
         allWordCount = sumValues trainingData.docCounts
 
         # Figure out P(C)
@@ -80,16 +79,19 @@ class BayesianClassifier
 
     # for a file, `docPath`, get the valid words
     # and for each word count it's occurance, in it's Class, `klass`, and in the entire dictionary
-    trainDocument = (td, klass, docPath) ->
+    trainDocument: (td, klass, words) ->
+        if !td.docCounts[klass]?
+            td.docCounts[klass] = 0 
+            td.classWords[klass] = {}
+
         td.docCounts[klass]++
         kw = td.classWords[klass]
-        for word in getFilteredWordFromDoc docPath 
+        for word in words
             td.wordCounts[word] = 0 if !td.wordCounts[word]?
             kw[word] = 0 if !kw[word]?
 
             td.wordCounts[word]++
             kw[word]++
-
 
     sum = (l) -> l.reduce ((a,b) -> a+b), 0
     sumValues = (o) ->
@@ -104,7 +106,7 @@ class BayesianClassifier
         summary = {}        
         for file in files when file isnt '.DS_Store'
             srcFile = "#{testDir}/#{file}"
-            klass = @.classifyDocument classiferData, srcFile
+            klass = @.classifyDocument classiferData, getFilteredWordFromDoc(srcFile)
             summary[klass] = 1 + if summary[klass]? then summary[klass] else 0 
             destDir = "#{resultsDir}/#{klass}"
             mkdirp.sync destDir
@@ -115,17 +117,16 @@ class BayesianClassifier
     # Get the words for a doc
     # compute the `P(C|D)`
     # get the Class which has the greatest `P(C|D)`
-    classifyDocument: (classiferData, docPath) ->
-        words = getFilteredWordFromDoc docPath
-        probs = (getClassificationProb classiferData, klass, words for klass, ign of classiferData.priors)
+    classifyDocument: (classiferData, words) ->
+        probs = (@getClassificationProb(classiferData, klass, words) for klass, ign of classiferData.priors)
         l = probs.reduce ((memo,item) -> if item.logprob > memo.logprob then item else memo), logprob:-Number.MAX_VALUE
         l.class
 
 
     # For a Document, `words`, and a Class, `klass` compute the following
     # <p><span class="math">\(\ln(P(C_{klass})) + \sum \ln(P(Words_n|C_{klass}))\)</span></p>
-    # though note that the actual individual probabilites have been computed, and this is mostly a lookup task
-    getClassificationProb = (classiferData, klass, words) ->
+    # though note that the actual individual probabilities have been computed, and this is mostly a lookup task
+    getClassificationProb: (classiferData, klass, words) ->
         ll = classiferData.likelihood[klass]
         getLikelihood = (w) -> if ll[w]? then ll[w] else classiferData.unknownWord[klass]
         likelihood = sum(getLikelihood(w) for w in words)

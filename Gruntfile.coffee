@@ -21,10 +21,15 @@ module.exports = (grunt) ->
         command: 'mkdir output'
       dzslides:
         command: "pandoc  --mathjax=#{mathjaxUrl} --css=lab49.css -t dzslides -s pres.md -o output/nbc.html"
-      makeEquations:
-        command: 'coffee makeEquations.coffee'
+      # makeEquations:
+      #   command: 'coffee makeEquations.coffee'
       groc:
-        command: 'groc README.md lib/nbc.coffee'
+        command: 'groc README.md test.coffee lib/nbc.coffee'
+      test:
+        command: 'mocha  --compilers coffee:coffee-script  test.coffee -R spec'
+        options:
+          stdout: true
+          stderr: true
     stylus:
       compile:
         options:
