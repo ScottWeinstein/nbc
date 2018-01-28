@@ -1,6 +1,8 @@
 nbc
 ===
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/ScottWeinstein/nbc.svg)](https://greenkeeper.io/)
+
 ## Installation
 * Node
 * [Pandoc](http://johnmacfarlane.net/pandoc/installing.html)
